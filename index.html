@@ -39,6 +39,7 @@
             background-color: white;
             box-sizing: border-box;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
+            position: relative; /* 確保反思按鈕能定位在頁面內 */
         }
 
         /* 4. 圖片設定 */
@@ -105,12 +106,64 @@
             transform: translateY(-3px);
         }
 
+        /* ===============================
+           互動反思按鈕與視窗樣式 (修改位置)
+        ================================= */
+        .think-icon {
+            position: absolute;
+            bottom: 2%;  /* 將原本的 8% 縮小為 3%，按鈕會更貼近底部 */
+            right: 7%;   /* 將原本的 8% 縮小為 3%，按鈕會更貼近右側 */
+            background: #ffcc00;
+            color: #333;
+            padding: 6px 12px; 
+            border-radius: 15px; 
+            font-weight: bold;
+            font-size: 13px; 
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            z-index: 50; 
+            animation: pulse 2s infinite; 
+        }
+        .think-icon:hover { transform: scale(1.1); background: #ffaa00; }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 204, 0, 0.7); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 8px rgba(255, 204, 0, 0); } 
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 204, 0, 0); }
+        }
+
+        .modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: none; 
+            justify-content: center; align-items: center;
+            z-index: 1000; 
+            opacity: 0; transition: opacity 0.3s ease;
+        }
+        .modal-overlay.show { display: flex; opacity: 1; }
+
+        .modal-content {
+            background: white; padding: 30px; border-radius: 15px;
+            width: 80%; max-width: 400px; text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            transform: translateY(-20px); transition: transform 0.3s ease;
+        }
+        .modal-overlay.show .modal-content { transform: translateY(0); }
+        .modal-content h3 { margin-top: 0; color: #d35400; font-size: 24px; margin-bottom: 15px; }
+        .modal-content p { font-size: 18px; line-height: 1.6; color: #333; margin-bottom: 25px; }
+        #close-modal-btn {
+            background: #4CAF50; color: white; border: none;
+            padding: 10px 20px; font-size: 16px; border-radius: 8px; cursor: pointer;
+        }
+        #close-modal-btn:hover { background: #45a049; }
+
         @media (max-width: 600px) {
             #flipbook .page { border: none !important; }
             .nav-button { width: 30px; height: 50px; font-size: 20px; line-height: 50px; }
             #prev-btn { left: 5px; }
             #next-btn { right: 5px; }
             #home-btn { bottom: 10px; right: 10px; padding: 8px 15px; font-size: 14px; }
+            .think-icon { font-size: 11px; padding: 5px 8px; bottom: 2%; right: 2%; } /* 手機版進一步貼近右下角 */
         }
     </style>
 </head>
@@ -136,23 +189,43 @@
         <div class="page"><img src="images/9.png" alt="第9頁" /></div>
         <div class="page"><img src="images/10.png" alt="第10頁" /></div>
         <div class="page"><img src="images/11.png" alt="第11頁" /></div>
-        <div class="page"><img src="images/12.png" alt="第12頁" /></div>
+        <div class="page"><img src="images/12.png" alt="第12頁" /></div>        
         <div class="page"><img src="images/13.png" alt="第13頁" /></div>
-        <div class="page"><img src="images/14.png" alt="第14頁" /></div>
+        <div class="page">
+            <img src="images/14.png" alt="第14頁" />
+            <div class="think-icon" data-question="如果你是稚諭，來到一個聽不懂大家說話的新環境，心裡可能會有什麼感覺呢？">💡 想一想</div>
+        </div>
+
         <div class="page"><img src="images/15.png" alt="第15頁" /></div>
         <div class="page"><img src="images/16.png" alt="第16頁" /></div>
         <div class="page"><img src="images/17.png" alt="第17頁" /></div>
         <div class="page"><img src="images/18.png" alt="第18頁" /></div>
-        <div class="page"><img src="images/19.png" alt="第19頁" /></div>
+        <div class="page"><img src="images/19.png" alt="第19頁" /></div>        
         <div class="page"><img src="images/20.png" alt="第20頁" /></div>
-        <div class="page"><img src="images/21.png" alt="第21頁" /></div>
+        <div class="page">
+            <img src="images/21.png" alt="第21頁" />
+            <div class="think-icon" data-question="明明是想幫忙卻被大聲責備，如果你是稚諭，這時候你會怎麼想？又會怎麼做呢？">💡 想一想</div>
+        </div>        
         <div class="page"><img src="images/22.png" alt="第22頁" /></div>
-        <div class="page"><img src="images/23.png" alt="第23頁" /></div>
+        <div class="page">
+            <img src="images/23.png" alt="第23頁" />
+            <div class="think-icon" data-question="聽到老奶奶主動道歉，稚諭沒有轉身逃走。換作是你，你會選擇原諒老奶奶嗎？為什麼？">💡 想一想</div>
+        </div>
+
         <div class="page"><img src="images/24.png" alt="第24頁" /></div>
         <div class="page"><img src="images/25.png" alt="第25頁" /></div>
         <div class="page"><img src="images/26.png" alt="第26頁" /></div>
         <div class="page"><img src="images/27.png" alt="第27頁" /></div>
         <div class="page"><img src="images/28.png" alt="封底" /></div>
+    </div>
+
+    <!-- === 彈出視窗結構 (新增) === -->
+    <div id="question-modal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modal-title">想一想 🤔</h3>
+            <p id="modal-text">這裡會顯示問題內容</p>
+            <button id="close-modal-btn">關閉並繼續閱讀</button>
+        </div>
     </div>
 
     <script src="lib/jquery.min.js"></script>
@@ -210,12 +283,9 @@
                 // --- 2. 這裡加入手機/電腦的判斷 ---
                 if (isMobile()) {
                     // === 手機版 (單頁模式) ===
-                    // 手機只播「當前翻到的那一頁」(page)，不需要串接
                     playFile(page, null);
-                
                 } else {
                     // === 電腦版 (雙頁模式) ===
-                    // 電腦要播 view 裡的兩個頁面：先左(view[0]) -> 再右(view[1])
                     var leftPage = view[0];
                     var rightPage = view[1];
 
@@ -267,7 +337,6 @@
                             flipSound.play().catch(function(e) {});
                         }
                         
-                        // 呼叫播放函式，傳入 page (單頁用) 和 view (雙頁用)
                         playAudioSequence(page, view);
                     }
                 }
@@ -280,17 +349,49 @@
                 $('#flipbook').turn('page', 1); 
             });
 
+            // ==========================================
+            // 更新版：處理「想一想」按鈕與彈出視窗的邏輯
+            // ==========================================
+            
+            // 1. 攔截滑鼠或手指按下的動作，防止 turn.js 觸發翻書特效
+            $(document).on('mousedown touchstart', '.think-icon', function(e) {
+                e.stopPropagation(); 
+            });
+
+            // 2. 使用「事件委派」綁定點擊事件，確保動態生成的元素也能被點擊
+            $(document).on('click', '.think-icon', function(e) {
+                e.stopPropagation(); 
+                // 使用 attr() 來抓取資料，在 turn.js 中會比 data() 更穩定
+                var questionText = $(this).attr('data-question'); 
+                $('#modal-text').text(questionText);         
+                $('#question-modal').addClass('show');       
+            });
+
+            $('#close-modal-btn').click(function() {
+                $('#question-modal').removeClass('show');
+            });
+
+            $('#question-modal').click(function(e) {
+                if (e.target === this) {
+                    $(this).removeClass('show');
+                }
+            });
+
+            // ==========================================
+            // 更新版：修改書本點擊翻頁邏輯 (更嚴謹的防呆)
+            // ==========================================
             $('#flipbook').bind('click', function(e){
+                // 防呆：使用 closest() 確保點擊到按鈕內部任何地方都不會翻頁
+                if ($(e.target).closest('.think-icon').length > 0) {
+                    return;
+                }
+                
                 var offset = $(this).offset();
                 if (e.clientX < offset.left + $(this).width() / 2) {
                     $('#flipbook').turn('previous');
                 } else {
                     $('#flipbook').turn('next');
                 }
-            });
-
-            $(window).resize(function() {
-                location.reload();
             });
         });
     </script>
