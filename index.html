@@ -17,7 +17,6 @@
     <link rel="stylesheet" href="lib/turn.css" />
 
     <style>
-        /* 1. 網頁背景設定 */
         body, html { 
             margin: 0; 
             padding: 0; 
@@ -29,20 +28,17 @@
             align-items: center;        
         }
 
-        /* 2. 書本容器 */
         #flipbook {
             transition: transform 0.5s ease-in-out;
         }
 
-        /* 3. 頁面基本設定 */
         #flipbook .page {
             background-color: white;
             box-sizing: border-box;
             box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
-            position: relative; /* 確保反思按鈕能定位在頁面內 */
+            position: relative; 
         }
 
-        /* 4. 圖片設定 */
         #flipbook .page img {
             width: 100%;
             height: 100%;
@@ -51,18 +47,15 @@
             user-drag: none;
         }
 
-        /* 電腦版的分隔線 */
         #flipbook .page:nth-child(even) { border-right: 1px solid #d0d0d0; }
         #flipbook .page:nth-child(odd) { border-left: 1px solid #d0d0d0; }
 
-        /* 封面封底無分隔線 */
         #flipbook .page[page="1"], 
         #flipbook .page[page="28"] { 
             border: none !important;
             box-shadow: 0 5px 20px rgba(0,0,0,0.3); 
         }
 
-        /* --- 按鈕樣式 --- */
         .nav-button {
             position: fixed;
             top: 50%;
@@ -106,13 +99,10 @@
             transform: translateY(-3px);
         }
 
-        /* ===============================
-           互動反思按鈕與視窗樣式 (修改位置)
-        ================================= */
         .think-icon {
             position: absolute;
-            bottom: 2%;  /* 將原本的 8% 縮小為 3%，按鈕會更貼近底部 */
-            right: 7%;   /* 將原本的 8% 縮小為 3%，按鈕會更貼近右側 */
+            bottom: 2%;  
+            right: 7%;   
             background: #ffcc00;
             color: #333;
             padding: 6px 12px; 
@@ -163,7 +153,7 @@
             #prev-btn { left: 5px; }
             #next-btn { right: 5px; }
             #home-btn { bottom: 10px; right: 10px; padding: 8px 15px; font-size: 14px; }
-            .think-icon { font-size: 11px; padding: 5px 8px; bottom: 2%; right: 2%; } /* 手機版進一步貼近右下角 */
+            .think-icon { font-size: 11px; padding: 5px 8px; bottom: 2%; right: 2%; } 
         }
     </style>
 </head>
@@ -219,7 +209,7 @@
         <div class="page"><img src="images/28.png" alt="封底" /></div>
     </div>
 
-    <!-- === 彈出視窗結構 (新增) === -->
+    <!-- === 彈出視窗結構 === -->
     <div id="question-modal" class="modal-overlay">
         <div class="modal-content">
             <h3 id="modal-title">想一想 🤔</h3>
@@ -245,8 +235,6 @@
 
             // --- 核心修改：智慧判斷播放邏輯 ---
             function playAudioSequence(page, view) {
-                
-                // 1. 強制停止舊聲音
                 if (currentNarrative) {
                     currentNarrative.pause();
                     currentNarrative.currentTime = 0;
@@ -254,9 +242,8 @@
                     currentNarrative = null;
                 }
 
-                // 內部函式：播放單一檔案
                 function playFile(pageNum, callback) {
-                    if (!pageNum || pageNum < 4) { // 沒頁碼或小於第4頁不播
+                    if (!pageNum || pageNum < 4) { 
                         if (callback) callback();
                         return;
                     }
@@ -268,7 +255,6 @@
                     var playPromise = audioObj.play();
                     if (playPromise !== undefined) {
                         playPromise.catch(function(error) {
-                            // 播放失敗也要繼續 callback，避免卡住
                             if (callback) callback(); 
                         });
                     }
@@ -280,12 +266,9 @@
                     }
                 }
 
-                // --- 2. 這裡加入手機/電腦的判斷 ---
                 if (isMobile()) {
-                    // === 手機版 (單頁模式) ===
                     playFile(page, null);
                 } else {
-                    // === 電腦版 (雙頁模式) ===
                     var leftPage = view[0];
                     var rightPage = view[1];
 
@@ -297,25 +280,57 @@
 
             var flipSound = document.getElementById("page-sound");
 
-            var bookWidth = 800;
-            var bookHeight = 500;
+            // ==========================================
+            // 新增：動態計算書本尺寸以完美符合螢幕大小
+            // ==========================================
+            var screenWidth = $(window).width();
+            var screenHeight = $(window).height();
+            var bookWidth, bookHeight;
             var maxPages = $('#flipbook').children().length; 
 
             if (isMobile()) {
-                var screenWidth = $(window).width();
-                bookWidth = screenWidth * 0.95; 
-                bookHeight = bookWidth / 0.8; 
+                // 手機單頁模式，維持原本的比例 0.8 (寬:高)
+                var targetRatio = 0.8;
+                var availableWidth = screenWidth * 0.95;
+                var availableHeight = screenHeight * 0.85;
+
+                if (availableWidth / targetRatio <= availableHeight) {
+                    bookWidth = availableWidth;
+                    bookHeight = availableWidth / targetRatio;
+                } else {
+                    bookHeight = availableHeight;
+                    bookWidth = availableHeight * targetRatio;
+                }
+            } else {
+                // 電腦雙頁模式，維持比例 1.6 (雙頁寬:高)
+                var targetRatio = 1.6;
+                // 預留左右各一點空間給按鈕，預留上下空間
+                var availableWidth = screenWidth * 0.85; 
+                var availableHeight = screenHeight * 0.85; 
+
+                if (availableWidth / targetRatio <= availableHeight) {
+                    bookWidth = availableWidth;
+                    bookHeight = availableWidth / targetRatio;
+                } else {
+                    bookHeight = availableHeight;
+                    bookWidth = availableHeight * targetRatio;
+                }
             }
 
+            // ==========================================
+            // 更新版：動態計算翻頁時的位移距離
+            // ==========================================
             function adjustPosition(page) {
                 if (isMobile()) {
                     $('#flipbook').css('transform', 'translateX(0px)');
                     return;
                 }
+                // 書本總寬度的 1/4 就是單頁的一半寬度
+                var shiftDistance = bookWidth / 4; 
                 if (page === 1) {
-                    $('#flipbook').css('transform', 'translateX(-200px)');
+                    $('#flipbook').css('transform', 'translateX(-' + shiftDistance + 'px)');
                 } else if (page === maxPages) {
-                    $('#flipbook').css('transform', 'translateX(200px)');
+                    $('#flipbook').css('transform', 'translateX(' + shiftDistance + 'px)');
                 } else {
                     $('#flipbook').css('transform', 'translateX(0px)');
                 }
@@ -326,8 +341,8 @@
             $('#flipbook').turn({
                 display: displayMode,
                 autoCenter: false, 
-                width: bookWidth,
-                height: bookHeight,
+                width: bookWidth,   // 使用動態計算的寬度
+                height: bookHeight, // 使用動態計算的高度
                 when: {
                     turning: function(event, page, view) {
                         adjustPosition(page);
@@ -348,20 +363,14 @@
             $('#home-btn').click(function() { 
                 $('#flipbook').turn('page', 1); 
             });
-
-            // ==========================================
-            // 更新版：處理「想一想」按鈕與彈出視窗的邏輯
-            // ==========================================
             
-            // 1. 攔截滑鼠或手指按下的動作，防止 turn.js 觸發翻書特效
+            // 處理「想一想」按鈕
             $(document).on('mousedown touchstart', '.think-icon', function(e) {
                 e.stopPropagation(); 
             });
 
-            // 2. 使用「事件委派」綁定點擊事件，確保動態生成的元素也能被點擊
             $(document).on('click', '.think-icon', function(e) {
                 e.stopPropagation(); 
-                // 使用 attr() 來抓取資料，在 turn.js 中會比 data() 更穩定
                 var questionText = $(this).attr('data-question'); 
                 $('#modal-text').text(questionText);         
                 $('#question-modal').addClass('show');       
@@ -377,11 +386,7 @@
                 }
             });
 
-            // ==========================================
-            // 更新版：修改書本點擊翻頁邏輯 (更嚴謹的防呆)
-            // ==========================================
             $('#flipbook').bind('click', function(e){
-                // 防呆：使用 closest() 確保點擊到按鈕內部任何地方都不會翻頁
                 if ($(e.target).closest('.think-icon').length > 0) {
                     return;
                 }
@@ -392,6 +397,14 @@
                 } else {
                     $('#flipbook').turn('next');
                 }
+            });
+
+            // 新增：當讀者改變視窗大小時，自動重新整理以重新計算最佳尺寸
+            $(window).resize(function() {
+                clearTimeout(window.resizedFinished);
+                window.resizedFinished = setTimeout(function(){
+                    location.reload();
+                }, 250);
             });
         });
     </script>
