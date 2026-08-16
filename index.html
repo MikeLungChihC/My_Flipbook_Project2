@@ -209,7 +209,6 @@
         <div class="page"><img src="images/28.png" alt="封底" /></div>
     </div>
 
-    <!-- === 彈出視窗結構 === -->
     <div id="question-modal" class="modal-overlay">
         <div class="modal-content">
             <h3 id="modal-title">想一想 🤔</h3>
@@ -309,13 +308,11 @@
                 }
             }
 
-
             function adjustPosition(page) {
                 if (isMobile()) {
                     $('#flipbook').css('transform', 'translateX(0px)');
                     return;
                 }
-                // 
                 var shiftDistance = bookWidth / 4; 
                 if (page === 1) {
                     $('#flipbook').css('transform', 'translateX(-' + shiftDistance + 'px)');
@@ -347,31 +344,47 @@
                 }
             });
 
-            $('#prev-btn').click(function() { $('#flipbook').turn('previous'); });
-            $('#next-btn').click(function() { $('#flipbook').turn('next'); });
+            // ==========================================
+            // 更新版：所有按鈕都支援 touchend 和 preventDefault 以解決手機無法點擊的問題
+            // ==========================================
+            $('#prev-btn').on('click touchend', function(e) { 
+                e.preventDefault();
+                $('#flipbook').turn('previous'); 
+            });
             
-            $('#home-btn').click(function() { 
+            $('#next-btn').on('click touchend', function(e) { 
+                e.preventDefault();
+                $('#flipbook').turn('next'); 
+            });
+            
+            $('#home-btn').on('click touchend', function(e) { 
+                e.preventDefault();
                 $('#flipbook').turn('page', 1); 
             });
             
-            // 
+            // 處理「想一想」按鈕
             $(document).on('mousedown touchstart', '.think-icon', function(e) {
                 e.stopPropagation(); 
             });
 
-            $(document).on('click', '.think-icon', function(e) {
+            $(document).on('click touchend', '.think-icon', function(e) {
+                e.preventDefault(); // 非常重要：防止手機瀏覽器點擊穿透
                 e.stopPropagation(); 
                 var questionText = $(this).attr('data-question'); 
                 $('#modal-text').text(questionText);         
                 $('#question-modal').addClass('show');       
             });
 
-            $('#close-modal-btn').click(function() {
+            // 關閉視窗按鈕也支援手機點擊
+            $('#close-modal-btn').on('click touchend', function(e) {
+                e.preventDefault();
                 $('#question-modal').removeClass('show');
             });
 
-            $('#question-modal').click(function(e) {
+            // 點擊黑色背景關閉視窗
+            $('#question-modal').on('click touchend', function(e) {
                 if (e.target === this) {
+                    e.preventDefault();
                     $(this).removeClass('show');
                 }
             });
@@ -389,7 +402,6 @@
                 }
             });
 
-            // 
             $(window).resize(function() {
                 clearTimeout(window.resizedFinished);
                 window.resizedFinished = setTimeout(function(){
