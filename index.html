@@ -226,14 +226,12 @@
             
             var currentNarrative = null; 
 
-            // --- 判斷是手機還是電腦 ---
             function isMobile() {
                 return $(window).width() < 600;
             }
 
             var displayMode = isMobile() ? 'single' : 'double';
 
-            // --- 核心修改：智慧判斷播放邏輯 ---
             function playAudioSequence(page, view) {
                 if (currentNarrative) {
                     currentNarrative.pause();
@@ -280,16 +278,12 @@
 
             var flipSound = document.getElementById("page-sound");
 
-            // ==========================================
-            // 新增：動態計算書本尺寸以完美符合螢幕大小
-            // ==========================================
             var screenWidth = $(window).width();
             var screenHeight = $(window).height();
             var bookWidth, bookHeight;
             var maxPages = $('#flipbook').children().length; 
 
             if (isMobile()) {
-                // 手機單頁模式，維持原本的比例 0.8 (寬:高)
                 var targetRatio = 0.8;
                 var availableWidth = screenWidth * 0.95;
                 var availableHeight = screenHeight * 0.85;
@@ -302,9 +296,7 @@
                     bookWidth = availableHeight * targetRatio;
                 }
             } else {
-                // 電腦雙頁模式，維持比例 1.6 (雙頁寬:高)
                 var targetRatio = 1.6;
-                // 預留左右各一點空間給按鈕，預留上下空間
                 var availableWidth = screenWidth * 0.85; 
                 var availableHeight = screenHeight * 0.85; 
 
@@ -317,15 +309,13 @@
                 }
             }
 
-            // ==========================================
-            // 更新版：動態計算翻頁時的位移距離
-            // ==========================================
+
             function adjustPosition(page) {
                 if (isMobile()) {
                     $('#flipbook').css('transform', 'translateX(0px)');
                     return;
                 }
-                // 書本總寬度的 1/4 就是單頁的一半寬度
+                // 
                 var shiftDistance = bookWidth / 4; 
                 if (page === 1) {
                     $('#flipbook').css('transform', 'translateX(-' + shiftDistance + 'px)');
@@ -341,8 +331,8 @@
             $('#flipbook').turn({
                 display: displayMode,
                 autoCenter: false, 
-                width: bookWidth,   // 使用動態計算的寬度
-                height: bookHeight, // 使用動態計算的高度
+                width: bookWidth,   
+                height: bookHeight, 
                 when: {
                     turning: function(event, page, view) {
                         adjustPosition(page);
@@ -364,7 +354,7 @@
                 $('#flipbook').turn('page', 1); 
             });
             
-            // 處理「想一想」按鈕
+            // 
             $(document).on('mousedown touchstart', '.think-icon', function(e) {
                 e.stopPropagation(); 
             });
@@ -399,7 +389,7 @@
                 }
             });
 
-            // 新增：當讀者改變視窗大小時，自動重新整理以重新計算最佳尺寸
+            // 
             $(window).resize(function() {
                 clearTimeout(window.resizedFinished);
                 window.resizedFinished = setTimeout(function(){
