@@ -99,6 +99,27 @@
             transform: translateY(-3px);
         }
 
+        /* 新增：反思紀錄按鈕 */
+        #record-btn {
+            position: fixed;
+            bottom: 30px;
+            left: 30px;
+            padding: 12px 24px;
+            background: #2980b9;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 16px;
+            z-index: 101;
+            transition: all 0.3s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        #record-btn:hover {
+            background: #1c5980;
+            transform: translateY(-3px);
+        }
+
         .think-icon {
             position: absolute;
             bottom: 2%;  
@@ -134,18 +155,80 @@
 
         .modal-content {
             background: white; padding: 30px; border-radius: 15px;
-            width: 80%; max-width: 400px; text-align: center;
+            width: 80%; max-width: 450px; text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.5);
             transform: translateY(-20px); transition: transform 0.3s ease;
         }
         .modal-overlay.show .modal-content { transform: translateY(0); }
         .modal-content h3 { margin-top: 0; color: #d35400; font-size: 24px; margin-bottom: 15px; }
-        .modal-content p { font-size: 18px; line-height: 1.6; color: #333; margin-bottom: 25px; }
-        #close-modal-btn {
-            background: #4CAF50; color: white; border: none;
-            padding: 10px 20px; font-size: 16px; border-radius: 8px; cursor: pointer;
+        .modal-content p { font-size: 18px; line-height: 1.6; color: #333; margin-bottom: 15px; text-align: left;}
+        
+        /* 新增：文字輸入框與按鈕樣式 */
+        textarea#user-answer {
+            width: 100%;
+            height: 100px;
+            padding: 12px;
+            margin-bottom: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            resize: none;
+            font-family: inherit;
         }
-        #close-modal-btn:hover { background: #45a049; }
+        textarea#user-answer:focus {
+            border-color: #f39c12;
+            outline: none;
+        }
+        .modal-buttons {
+            display: flex;
+            justify-content: space-between;
+            gap: 10px;
+        }
+        .modal-buttons button {
+            flex: 1;
+            padding: 12px;
+            font-size: 16px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            color: white;
+            transition: background 0.3s;
+        }
+        #save-modal-btn { background: #e67e22; font-weight: bold;}
+        #save-modal-btn:hover { background: #d35400; }
+        #close-modal-btn, #close-record-btn { background: #95a5a6; }
+        #close-modal-btn:hover, #close-record-btn:hover { background: #7f8c8d; }
+        #print-btn { background: #27ae60; font-weight: bold;}
+        #print-btn:hover { background: #2ecc71; }
+
+        /* 新增：反思紀錄視窗樣式 */
+        .record-content {
+            max-width: 600px;
+            width: 90%;
+            text-align: left;
+            max-height: 85vh;
+            overflow-y: auto;
+        }
+        .record-item {
+            background: #fdfdfd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #f39c12;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .record-item h4 { margin: 0 0 10px 0; color: #2c3e50; font-size: 15px; line-height: 1.4; }
+        .record-item p { margin: 0; color: #16a085; white-space: pre-wrap; font-size: 16px; font-weight: bold;}
+
+        /* 新增：列印樣式 (點擊列印時只印出紀錄) */
+        @media print {
+            body * { visibility: hidden; }
+            #record-modal, #record-modal * { visibility: visible; }
+            #record-modal { position: absolute; left: 0; top: 0; width: 100%; background: white; }
+            .modal-content { box-shadow: none; border: none; width: 100%; max-width: none; }
+            .modal-buttons { display: none !important; }
+        }
 
         @media (max-width: 600px) {
             #flipbook .page { border: none !important; }
@@ -153,7 +236,9 @@
             #prev-btn { left: 5px; }
             #next-btn { right: 5px; }
             #home-btn { bottom: 10px; right: 10px; padding: 8px 15px; font-size: 14px; }
+            #record-btn { bottom: 10px; left: 10px; padding: 8px 15px; font-size: 14px; }
             .think-icon { font-size: 11px; padding: 5px 8px; bottom: 2%; right: 2%; } 
+            .modal-content { padding: 20px; width: 90%; }
         }
     </style>
 </head>
@@ -162,6 +247,7 @@
     <button id="prev-btn" class="nav-button"> &lt; </button>
     <button id="next-btn" class="nav-button"> &gt; </button>
     <button id="home-btn">回到封面</button>
+    <button id="record-btn">我的反思紀錄</button> 
 
     <audio id="page-sound">
         <source src="page-flip.mp3" type="audio/mpeg">
@@ -183,7 +269,7 @@
         <div class="page"><img src="images/13.png" alt="第13頁" /></div>
         <div class="page">
             <img src="images/14.png" alt="第14頁" />
-            <div class="think-icon" data-question="如果你是稚諭，來到一個聽不懂大家說話的新環境，你可能會有什麼感覺？為什麼會有這樣的感覺呢？">💡 想一想</div>
+            <div class="think-icon" data-id="q1" data-question="如果你是稚諭，來到一個聽不懂大家說話的新環境，你可能會有什麼感覺？為什麼會有這樣的感覺呢？">💡 想一想</div>
         </div>
         <div class="page"><img src="images/15.png" alt="第15頁" /></div>
         <div class="page"><img src="images/16.png" alt="第16頁" /></div>
@@ -193,12 +279,12 @@
         <div class="page"><img src="images/20.png" alt="第20頁" /></div>
         <div class="page">
             <img src="images/21.png" alt="第21頁" />
-            <div class="think-icon" data-question="明明是想幫忙，卻被大聲責備。如果你是稚諭，這時候你會有什麼感受？你會怎麼做，才能讓對方知道你的想法呢？">💡 想一想</div>
+            <div class="think-icon" data-id="q2" data-question="明明是想幫忙，卻被大聲責備。如果你是稚諭，這時候你會有什麼感受？你會怎麼做，才能讓對方知道你的想法呢？">💡 想一想</div>
         </div>    
         <div class="page"><img src="images/22.png" alt="第22頁" /></div>
         <div class="page">
             <img src="images/23.png" alt="第23頁" />
-            <div class="think-icon" data-question="聽到老奶奶主動道歉，如果你是稚諭，你願意留下來聽她說嗎？你會想對老奶奶說些什麼呢？">💡 想一想</div>
+            <div class="think-icon" data-id="q3" data-question="聽到老奶奶主動道歉，如果你是稚諭，你願意留下來聽她說嗎？你會想對老奶奶說些什麼呢？">💡 想一想</div>
         </div>
 
         <div class="page"><img src="images/24.png" alt="第24頁" /></div>
@@ -208,11 +294,30 @@
         <div class="page"><img src="images/28.png" alt="封底" /></div>
     </div>
 
+    <!-- === 更新：題目與輸入視窗 === -->
     <div id="question-modal" class="modal-overlay">
         <div class="modal-content">
             <h3 id="modal-title">想一想 🤔</h3>
             <p id="modal-text">這裡會顯示問題內容</p>
-            <button id="close-modal-btn">關閉並繼續閱讀</button>
+            <textarea id="user-answer" placeholder="請在這裡打字，寫下你的真實感受..."></textarea>
+            <div class="modal-buttons">
+                <button id="save-modal-btn">💾 儲存並繼續閱讀</button>
+                <button id="close-modal-btn">先不寫，關閉</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- === 新增：反思紀錄總覽視窗 === -->
+    <div id="record-modal" class="modal-overlay">
+        <div class="modal-content record-content">
+            <h3 style="text-align: center; color: #2980b9;">📝 我的反思紀錄</h3>
+            <div id="record-display">
+                <!-- 這裡會由 JS 動態生成紀錄內容 -->
+            </div>
+            <div class="modal-buttons" style="margin-top: 20px;">
+                <button id="print-btn">🖨️ 列印 / 存成 PDF</button>
+                <button id="close-record-btn">關閉</button>
+            </div>
         </div>
     </div>
 
@@ -223,6 +328,7 @@
         $(document).ready(function() {
             
             var currentNarrative = null; 
+            var currentQuestionId = null; 
 
             function isMobile() {
                 return $(window).width() < 600;
@@ -359,27 +465,126 @@
                 $('#flipbook').turn('page', 1); 
             });
             
-            // 
+            // 防止點擊圖示時觸發翻頁
             $(document).on('mousedown touchstart', '.think-icon', function(e) {
                 e.stopPropagation(); 
             });
 
+            // 開啟問題視窗並讀取之前的答案
             $(document).on('click touchend', '.think-icon', function(e) {
                 e.preventDefault(); 
                 e.stopPropagation(); 
+                
                 var questionText = $(this).attr('data-question'); 
-                $('#modal-text').text(questionText);         
+                currentQuestionId = $(this).attr('data-id'); 
+                
+                $('#modal-text').text(questionText);
+                
+                // 讀取 localStorage 裡面存過的答案
+                var savedAnswer = localStorage.getItem('flipbook_answer_' + currentQuestionId) || '';
+                $('#user-answer').val(savedAnswer);
+                         
                 $('#question-modal').addClass('show');       
             });
 
-            // 
+            // 處理手機點擊 textarea 會被背景關閉或觸發翻頁的問題
+            $('#user-answer').on('mousedown touchstart click touchend', function(e) {
+                e.stopPropagation();
+            });
+
+            // 儲存答案
+            $('#save-modal-btn').on('click touchend', function(e) {
+                e.preventDefault();
+                var answer = $('#user-answer').val().trim();
+                
+                if(currentQuestionId) {
+                    localStorage.setItem('flipbook_answer_' + currentQuestionId, answer);
+                    
+                    // 視覺回饋
+                    var originalText = $(this).text();
+                    var originalBg = $(this).css('background-color');
+                    $(this).text('✅ 儲存成功！');
+                    $(this).css('background-color', '#27ae60');
+                    
+                    var btn = $(this);
+                    setTimeout(function() {
+                        btn.text(originalText);
+                        btn.css('background-color', originalBg);
+                        $('#question-modal').removeClass('show');
+                    }, 800);
+                }
+            });
+
             $('#close-modal-btn').on('click touchend', function(e) {
                 e.preventDefault();
                 $('#question-modal').removeClass('show');
             });
 
-            // 
-            $('#question-modal').on('click touchend', function(e) {
+            // 開啟「我的反思紀錄」總覽 (升級版：含時間戳記與隨機鼓勵)
+            $('#record-btn').on('click touchend', function(e) {
+                e.preventDefault();
+                
+                // 抓取三題的紀錄
+                var rawQ1 = localStorage.getItem('flipbook_answer_q1') || '';
+                var rawQ2 = localStorage.getItem('flipbook_answer_q2') || '';
+                var rawQ3 = localStorage.getItem('flipbook_answer_q3') || '';
+                
+                // 判斷是否有寫內容 (只要有一題有寫字就算)
+                var hasWritten = (rawQ1.trim() !== '' || rawQ2.trim() !== '' || rawQ3.trim() !== '');
+                
+                // 如果沒寫，顯示提示文字
+                var q1 = rawQ1 ? rawQ1 : '（尚未填寫）';
+                var q2 = rawQ2 ? rawQ2 : '（尚未填寫）';
+                var q3 = rawQ3 ? rawQ3 : '（尚未填寫）';
+                
+                // 取得當前時間
+                var now = new Date();
+                var timeString = now.getFullYear() + '年' + (now.getMonth() + 1) + '月' + now.getDate() + '日 ' + 
+                                 String(now.getHours()).padStart(2, '0') + ':' + 
+                                 String(now.getMinutes()).padStart(2, '0');
+                
+                // 準備隨機鼓勵語庫 (5種替換)
+                var encouragements = [
+                    "太棒了！你很認真地感受了自己的情緒，這一步非常不容易喔！🌟",
+                    "寫下這些文字的你，展現了很棒的同理心與觀察力，繼續保持！👍",
+                    "你的反思非常深刻，把心裡的想法化為文字，是給自己最好的禮物！🎁",
+                    "好棒的紀錄！你願意花時間與自己對話，這份用心值得給一個大大的讚！✨",
+                    "看到你這麼用心地寫下感受，相信稚諭和老奶奶都會為你感動的！💖"
+                ];
+                
+                // 組合 HTML
+                var html = '';
+                
+                // 加上時間戳記
+                html += '<div style="text-align: right; color: #7f8c8d; font-size: 14px; margin-bottom: 15px; font-weight: bold;">紀錄時間：' + timeString + '</div>';
+                
+                html += '<div class="record-item"><h4>💡 問題 1：如果你是稚諭，來到一個聽不懂大家說話的新環境，你可能會有什麼感覺？為什麼會有這樣的感覺呢？</h4><p>' + q1 + '</p></div>';
+                html += '<div class="record-item"><h4>💡 問題 2：明明是想幫忙，卻被大聲責備。如果你是稚諭，這時候你會有什麼感受？你會怎麼做，才能讓對方知道你的想法呢？</h4><p>' + q2 + '</p></div>';
+                html += '<div class="record-item"><h4>💡 問題 3：聽到老奶奶主動道歉，如果你是稚諭，你願意留下來聽她說嗎？你會想對老奶奶說些什麼呢？</h4><p>' + q3 + '</p></div>';
+                
+                // 判斷並隨機加入鼓勵語
+                if (hasWritten) {
+                    var randomMsg = encouragements[Math.floor(Math.random() * encouragements.length)];
+                    html += '<div style="margin-top: 20px; padding: 15px; background-color: #fff3e0; border: 2px dashed #f39c12; border-radius: 10px; color: #d35400; font-size: 16px; font-weight: bold; text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">' + randomMsg + '</div>';
+                }
+                
+                $('#record-display').html(html);
+                $('#record-modal').addClass('show');
+            });
+
+            // 列印 / 轉存 PDF
+            $('#print-btn').on('click touchend', function(e) {
+                e.preventDefault();
+                window.print(); 
+            });
+
+            $('#close-record-btn').on('click touchend', function(e) {
+                e.preventDefault();
+                $('#record-modal').removeClass('show');
+            });
+
+            // 點擊黑色背景關閉視窗 (包含兩個視窗)
+            $('.modal-overlay').on('click touchend', function(e) {
                 if (e.target === this) {
                     e.preventDefault();
                     $(this).removeClass('show');
