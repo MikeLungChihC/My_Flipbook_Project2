@@ -183,9 +183,8 @@
         <div class="page"><img src="images/13.png" alt="第13頁" /></div>
         <div class="page">
             <img src="images/14.png" alt="第14頁" />
-            <div class="think-icon" data-question="如果你是稚諭，來到一個聽不懂大家說話的新環境，心裡可能會有什麼感覺呢？">💡 想一想</div>
+            <div class="think-icon" data-question="如果你是稚諭，來到一個聽不懂大家說話的新環境，你可能會有什麼感覺？為什麼會有這樣的感覺呢？">💡 想一想</div>
         </div>
-
         <div class="page"><img src="images/15.png" alt="第15頁" /></div>
         <div class="page"><img src="images/16.png" alt="第16頁" /></div>
         <div class="page"><img src="images/17.png" alt="第17頁" /></div>
@@ -194,12 +193,12 @@
         <div class="page"><img src="images/20.png" alt="第20頁" /></div>
         <div class="page">
             <img src="images/21.png" alt="第21頁" />
-            <div class="think-icon" data-question="明明是想幫忙卻被大聲責備，如果你是稚諭，這時候你會怎麼想？又會怎麼做呢？">💡 想一想</div>
-        </div>        
+            <div class="think-icon" data-question="明明是想幫忙，卻被大聲責備。如果你是稚諭，這時候你會有什麼感受？你會怎麼做，才能讓對方知道你的想法呢？">💡 想一想</div>
+        </div>    
         <div class="page"><img src="images/22.png" alt="第22頁" /></div>
         <div class="page">
             <img src="images/23.png" alt="第23頁" />
-            <div class="think-icon" data-question="聽到老奶奶主動道歉，稚諭沒有轉身逃走。換作是你，你會選擇原諒老奶奶嗎？為什麼？">💡 想一想</div>
+            <div class="think-icon" data-question="聽到老奶奶主動道歉，如果你是稚諭，你願意留下來聽她說嗎？你會想對老奶奶說些什麼呢？">💡 想一想</div>
         </div>
 
         <div class="page"><img src="images/24.png" alt="第24頁" /></div>
@@ -344,9 +343,7 @@
                 }
             });
 
-            // ==========================================
-            // 更新版：所有按鈕都支援 touchend 和 preventDefault 以解決手機無法點擊的問題
-            // ==========================================
+
             $('#prev-btn').on('click touchend', function(e) { 
                 e.preventDefault();
                 $('#flipbook').turn('previous'); 
@@ -362,26 +359,26 @@
                 $('#flipbook').turn('page', 1); 
             });
             
-            // 處理「想一想」按鈕
+            // 
             $(document).on('mousedown touchstart', '.think-icon', function(e) {
                 e.stopPropagation(); 
             });
 
             $(document).on('click touchend', '.think-icon', function(e) {
-                e.preventDefault(); // 非常重要：防止手機瀏覽器點擊穿透
+                e.preventDefault(); 
                 e.stopPropagation(); 
                 var questionText = $(this).attr('data-question'); 
                 $('#modal-text').text(questionText);         
                 $('#question-modal').addClass('show');       
             });
 
-            // 關閉視窗按鈕也支援手機點擊
+            // 
             $('#close-modal-btn').on('click touchend', function(e) {
                 e.preventDefault();
                 $('#question-modal').removeClass('show');
             });
 
-            // 點擊黑色背景關閉視窗
+            // 
             $('#question-modal').on('click touchend', function(e) {
                 if (e.target === this) {
                     e.preventDefault();
